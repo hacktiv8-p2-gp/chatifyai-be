@@ -12,7 +12,7 @@ module.exports = {
      *   isBetaMember: false
      * }], {});
     */
-    const user = require('../data/user.json')
+    const user = require('../data/users.json')
     user.forEach((user) => {
       user.createdAt = new Date()
       user.updatedAt = new Date()
