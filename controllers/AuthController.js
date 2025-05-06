@@ -40,11 +40,11 @@ class AuthController {
       });
 
       if (!user) {
-        throw { name: "Invalid email or password" };
+        throw new ResponseError("Invalid email or password", 401);
       }
 
       if (!comparePassword(password, user.password)) {
-        throw { name: "Invalid email or password" };
+        throw new ResponseError("Invalid email or password", 401);
       }
 
       const payload = {
