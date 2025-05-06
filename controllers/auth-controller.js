@@ -1,18 +1,31 @@
 const { User } = require("../models");
-const { comparePassword } = require("../helpers/bcrypt");
-const { token } = require("../helpers/jwt");
+const { comparePassword } = require("../helpers/Bcrypt");
+const { token } = require("../helpers/Jwt");
+const validate = require("../validation/Validate");
+const { authValidation } = require("../validation/AuthValidation");
 
 class AuthController {
+  static async register(req, rest, next) {
+    try {
+      const { email, password } = validate(authValidation, req.body);
+
+      const createUser = await User.create({ email, password });
+
+      console.log(createUser);
+
+      rest.status(200).json({
+        id: createUser.id,
+        email: createUser.email,
+        message: "User created successfully",
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
   static async login(req, rest, next) {
     try {
-      const { email, password } = req.body;
-
-      if (!email) {
-        throw { name: "Empty Email" };
-      }
-      if (!password) {
-        throw { name: "Empty Password" };
-      }
+      const { email, password } = validate(authValidation, req.body);
 
       const user = await User.findOne({
         where: {
