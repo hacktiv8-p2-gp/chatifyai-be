@@ -4,7 +4,9 @@ const { token } = require("../helpers/Jwt");
 const validate = require("../validation/Validate");
 const { authValidation } = require("../validation/AuthValidation");
 const { OAuth2Client } = require("google-auth-library");
+const { use } = require("../routers/AuthRouter");
 const client = new OAuth2Client();
+require("dotenv").config();
 
 class AuthController {
   // Register
@@ -38,11 +40,11 @@ class AuthController {
       });
 
       if (!user) {
-        throw { name: "Invalid email or password" };
+        throw new ResponseError("Invalid email or password", 401);
       }
 
       if (!comparePassword(password, user.password)) {
-        throw { name: "Invalid email or password" };
+        throw new ResponseError("Invalid email or password", 401);
       }
 
       const payload = {
@@ -66,14 +68,23 @@ class AuthController {
       const { googleToken } = req.body;
 
       const ticket = await client.verifyIdToken({
-        idToken: token,
-        audience: WEB_CLIENT_ID,
+        idToken: googleToken,
+        audience: process.env.GOOGLE_CLIENT_ID,
       });
       const payload = ticket.getPayload();
-      const userid = payload["sub"];
-      // If the request specified a Google Workspace domain:
-      // const domain = payload['hd'];
 
+      const user = await User.findOne({
+        where: {
+          email: payload.email,
+        },
+      });
+
+      if (!user) {
+        await User.create({
+          email: payload.email,
+          password: Math.random().toString(),
+        });
+      }
       rest.status(200).json({
         message: "Hello World!",
       });
