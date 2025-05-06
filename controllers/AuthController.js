@@ -3,8 +3,11 @@ const { comparePassword } = require("../helpers/Bcrypt");
 const { token } = require("../helpers/Jwt");
 const validate = require("../validation/Validate");
 const { authValidation } = require("../validation/AuthValidation");
+const { OAuth2Client } = require("google-auth-library");
+const client = new OAuth2Client();
 
 class AuthController {
+  // Register
   static async register(req, rest, next) {
     try {
       const { email, password } = validate(authValidation, req.body);
@@ -23,6 +26,7 @@ class AuthController {
     }
   }
 
+  // Login Email
   static async login(req, rest, next) {
     try {
       const { email, password } = validate(authValidation, req.body);
@@ -52,6 +56,29 @@ class AuthController {
         message: access_token,
       });
     } catch (error) {
+      next(error);
+    }
+  }
+
+  // Google Login
+  static async googleLogin(req, rest, next) {
+    try {
+      const { googleToken } = req.body;
+
+      const ticket = await client.verifyIdToken({
+        idToken: token,
+        audience: WEB_CLIENT_ID,
+      });
+      const payload = ticket.getPayload();
+      const userid = payload["sub"];
+      // If the request specified a Google Workspace domain:
+      // const domain = payload['hd'];
+
+      rest.status(200).json({
+        message: "Hello World!",
+      });
+    } catch (error) {
+      console.log(error);
       next(error);
     }
   }

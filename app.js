@@ -2,8 +2,8 @@ const express = require("express");
 const app = express();
 const port = 3000;
 const cors = require("cors");
-const AuthController = require("./controllers/auth-controller");
-const errorHandler = require("./middlewares/ErrorHandler");
+const AuthController = require("./controllers/AuthController");
+const errorHandler = require("./middlewares/ErrorMiddlewares");
 
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
