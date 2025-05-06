@@ -3,13 +3,14 @@ const app = express();
 const port = 3000;
 const cors = require("cors");
 const AuthController = require("./controllers/auth-controller");
-const errorHandler = require("./middlewares/errorHandler");
+const errorHandler = require("./middlewares/ErrorHandler");
 
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.post("/login", AuthController.login);
+app.post("/register", AuthController.register);
 
 // app.get('/', (req, res) => {
 //   res.send('Hello World!')
