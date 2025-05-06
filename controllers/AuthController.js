@@ -5,6 +5,7 @@ const validate = require("../validation/Validate");
 const { authValidation } = require("../validation/AuthValidation");
 const { OAuth2Client } = require("google-auth-library");
 const { use } = require("../routers/AuthRouter");
+const ResponseError = require("../helpers/ResponseError");
 const client = new OAuth2Client();
 require("dotenv").config();
 
@@ -40,10 +41,12 @@ class AuthController {
       });
 
       if (!user) {
+        console.log("This is the error 123456789");
         throw new ResponseError("Invalid email or password", 401);
       }
 
       if (!comparePassword(password, user.password)) {
+        console.log("This is the error");
         throw new ResponseError("Invalid email or password", 401);
       }
 
