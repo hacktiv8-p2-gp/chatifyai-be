@@ -24,9 +24,7 @@ class AuthController {
         throw { name: "Invalid email or password" };
       }
 
-      const isValid = comparePassword(password, user.password);
-
-      if (!isValid) {
+      if (!comparePassword(password, user.password)) {
         throw { name: "Invalid email or password" };
       }
 
