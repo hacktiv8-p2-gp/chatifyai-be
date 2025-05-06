@@ -2,16 +2,14 @@ const express = require("express");
 const app = express();
 const port = 3000;
 const cors = require("cors");
-const AuthController = require("./controllers/auth-controller");
-const errorHandler = require("./middlewares/ErrorHandler");
+const errorHandler = require("./middlewares/ErrorMiddlewares");
+const AuthRouter = require("./routers/AuthRouter");
 
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-app.post("/login", AuthController.login);
-app.post("/register", AuthController.register);
-
+app.use("/api/auth", AuthRouter);
 // app.get('/', (req, res) => {
 //   res.send('Hello World!')
 // })
