@@ -33,6 +33,17 @@ class ConversationController {
     }
   }
 
+  static async getUserCanAccessRoom(roomId, uid) {
+    const canAccess = await Friend.findOne({
+      where: {
+        roomId,
+        [Op.or]: [{ uid }, { friendUId: uid }],
+      },
+    });
+
+    return canAccess;
+  }
+
   static async createMessage({ roomId, message, user }) {
     try {
       const { uid } = user;
