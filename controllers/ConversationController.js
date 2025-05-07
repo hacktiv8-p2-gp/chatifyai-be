@@ -76,7 +76,7 @@ class ConversationController {
         },
       };
     } catch (e) {
-      next(e);
+      console.log(e);
     }
   }
 }

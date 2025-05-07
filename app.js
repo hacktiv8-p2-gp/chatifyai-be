@@ -15,12 +15,13 @@ const port = 3000;
 const cors = require("cors");
 const FriendRouter = require("./routers/FriendRouter");
 const ConversationRouter = require("./routers/ConversationRouter");
-const { AuthMiddleware } = require("./middlewares/AuthMiddleware");
+const { AuthMiddleware, admin } = require("./middlewares/AuthMiddleware");
 const {
   createMessage,
   getUserCanAccessRoom,
 } = require("./controllers/ConversationController");
 const ErrorMiddleware = require("./middlewares/ErrorMiddleware");
+const ResponseError = require("./helpers/ResponseError");
 
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
@@ -32,24 +33,30 @@ app.set("io", io);
 io.use(async (socket, next) => {
   try {
     const token = socket.handshake.auth.token;
-    if (!token) {
-      throw new Error("Token invalid");
+
+    if (!token || typeof token !== "string") {
+      throw new ResponseError("Invalid token format", 401);
     }
 
-    const payload = await admin.auth().verifyIdToken(token);
+    let payload;
+    try {
+      payload = await admin.auth().verifyIdToken(token);
+    } catch (e) {
+      throw new ResponseError("Token invalid", 401);
+    }
 
     socket.user = payload;
 
     next();
   } catch (e) {
-    next(new Error("Token invalid"));
+    next(e);
   }
 });
 
 io.on("connection", (socket) => {
   socket.on("join-room", async (roomId) => {
     try {
-      const canAccess = await getUserCanAccessRoom();
+      const canAccess = await getUserCanAccessRoom(roomId, socket.user.uid);
       if (!canAccess) {
         throw new Error("Access denied to this room");
       }
@@ -62,11 +69,12 @@ io.on("connection", (socket) => {
 
   socket.on("send-message", async ({ roomId, message }) => {
     try {
-      const messageData = await createMessage(roomId, message, socket.user.uid);
+      const user = socket.user;
+      const messageData = await createMessage({ roomId, message, user });
 
       io.to(roomId).emit("receive-message", messageData);
     } catch (error) {
-      socket.emit("error", e.message || "Internal Server Error");
+      socket.emit("error", error.message || "Internal Server Error");
     }
   });
 

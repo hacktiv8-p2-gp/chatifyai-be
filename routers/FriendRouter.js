@@ -4,7 +4,7 @@ const { getAll, request, get } = require("../controllers/FriendController");
 const FriendRouter = express.Router();
 
 FriendRouter.get("/", getAll);
-FriendRouter.get("/:email", get);
 FriendRouter.post("/request", request);
+FriendRouter.get("/:email", get);
 
 module.exports = FriendRouter;
