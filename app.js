@@ -18,6 +18,10 @@ const FriendRouter = require("./routers/FriendRouter");
 const ConversationRouter = require("./routers/ConversationRouter");
 const { AuthMiddleware } = require("./middlewares/AuthMiddleware");
 const { Op } = require("sequelize");
+const {
+  createMessage,
+  getUserCanAccessRoom,
+} = require("./controllers/ConversationController");
 
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
@@ -34,7 +38,9 @@ io.use(async (socket, next) => {
     }
 
     const payload = await admin.auth().verifyIdToken(token);
+
     socket.user = payload;
+
     next();
   } catch (e) {
     next(new Error("Token invalid"));
@@ -44,31 +50,24 @@ io.use(async (socket, next) => {
 io.on("connection", (socket) => {
   socket.on("join-room", async (roomId) => {
     try {
-      const canAccess = await Friend.findOne({
-        where: {
-          roomId,
-          [Op.or]: [{ uid: socket.user.uid }, { friendUId: socket.user.uid }],
-        },
-      });
-
+      const canAccess = await getUserCanAccessRoom();
       if (!canAccess) {
-        socket.emit("error", "Access denied to this room");
-        return;
+        throw new Error("Access denied to this room");
       }
 
       socket.join(roomId);
-    } catch (error) {
-      socket.emit("error", "Failed to join room");
+    } catch (e) {
+      socket.emit("error", e.message || "Internal Server Error");
     }
   });
 
-  socket.on("send-message", async ({ roomId, messasge }) => {
+  socket.on("send-message", async ({ roomId, message }) => {
     try {
       const messageData = await createMessage(roomId, message, socket.user.uid);
 
       io.to(roomId).emit("receive-message", messageData);
     } catch (error) {
-      socket.emit("error", "Failed to send message");
+      socket.emit("error", e.message || "Internal Server Error");
     }
   });
 
