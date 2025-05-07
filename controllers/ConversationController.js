@@ -1,5 +1,6 @@
 const { Conversation, Friend } = require("../models");
 const ResponseError = require("../helpers/ResponseError");
+const { Op } = require("sequelize");
 
 class ConversationController {
   static async getByRoomId(req, res, next) {
@@ -29,6 +30,7 @@ class ConversationController {
         data: conversations,
       });
     } catch (e) {
+      console.log(e);
       next(e);
     }
   }
@@ -74,7 +76,7 @@ class ConversationController {
         },
       };
     } catch (e) {
-      next(e);
+      console.log(e);
     }
   }
 }

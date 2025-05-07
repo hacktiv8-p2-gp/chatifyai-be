@@ -1,7 +1,10 @@
 const { Friend } = require("../models");
 const { Op } = require("sequelize");
 const { admin } = require("../middlewares/AuthMiddleware");
-const bcrypt = require("bcryptjs");
+const { getAuth } = require("firebase-admin/auth");
+const ResponseError = require("../helpers/ResponseError");
+const { nanoid } = require("nanoid");
+
 class FriendController {
   static async getAll(req, res, next) {
     try {
@@ -27,8 +30,6 @@ class FriendController {
               friendId: friendUid,
               email: friendData.email,
             },
-
-            since: friend.createdAt,
           };
         })
       );
@@ -37,24 +38,42 @@ class FriendController {
         data: mappedFriends,
       });
     } catch (e) {
+      console.log(e);
       next(e);
     }
   }
 
-  static async findUserByEmail(email) {
-    return await admin.auth().getUserByEmail(email);
+  static async get(req, res, next) {
+    try {
+      const { email } = req.params;
+
+      let user;
+      try {
+        user = await getAuth().getUserByEmail(email);
+      } catch (e) {
+        if (e.code === "auth/user-not-found") {
+          throw new ResponseError("User not found", 404);
+        }
+      }
+
+      res.status(200).json({
+        data: user,
+      });
+    } catch (e) {
+      next(e);
+    }
   }
 
   static async request(req, res, next) {
     try {
       const { uid, email } = req.user;
-      const { friendEmail } = req.body;
+      const { email: friendEmail } = req.body;
 
       if (email === friendEmail) {
         throw new ResponseError("Cannot add yourself as friend", 400);
       }
 
-      const userRecord = await this.findUserByEmail();
+      const userRecord = await getAuth().getUserByEmail(friendEmail);
       const friendUid = userRecord.uid;
 
       const existingFriend = await Friend.findOne({
@@ -89,6 +108,7 @@ class FriendController {
         },
       });
     } catch (e) {
+      console.log(e);
       next(e);
     }
   }
