@@ -31,7 +31,6 @@ async function AuthMiddleware(req, res, next) {
   try {
     payload = await admin.auth().verifyIdToken(token);
   } catch (e) {
-    console.log(e);
     throw new ResponseError("Token invalid", 401);
   }
   req.user = payload;
