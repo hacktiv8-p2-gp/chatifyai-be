@@ -47,6 +47,8 @@ class FriendController {
     try {
       const { email } = req.params;
 
+      console.log(email);
+
       let user;
       try {
         user = await getAuth().getUserByEmail(email);
@@ -55,6 +57,8 @@ class FriendController {
           throw new ResponseError("User not found", 404);
         }
       }
+
+      console.log(user);
 
       res.status(200).json({
         data: user,

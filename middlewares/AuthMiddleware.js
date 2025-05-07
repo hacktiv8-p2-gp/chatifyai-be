@@ -1,6 +1,6 @@
 const admin = require("firebase-admin");
 const ResponseError = require("../helpers/ResponseError");
-var serviceAccount = require("../hacktiv8-p2-gp-741fe-firebase-adminsdk-fbsvc-bf614a820b.json");
+var serviceAccount = require("../group-project-459009-firebase-adminsdk-fbsvc-5d33c459fc.json");
 admin.initializeApp({
   projectId: process.env.PROJECT_ID,
   credential: admin.credential.cert(serviceAccount),
