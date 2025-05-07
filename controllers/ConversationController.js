@@ -79,6 +79,28 @@ class ConversationController {
       console.log(e);
     }
   }
+
+  static async analysisMessage(roomId) {
+    try {
+      const { roomId } = req.params;
+      const conversations = await Conversation.findAll({
+        where: { roomId },
+        order: [["createdAt", "ASC"]],
+        attributes: ["id", "senderUid", "message", "createdAt"],
+      });
+
+      console.log(conversations);
+
+      const prompt = `${conversations.message} dari percakapan ini apa response yang baik`;
+
+      const geminiResponse = await geminiAI(prompt);
+
+      console.log(geminiResponse);
+      return geminiResponse;
+    } catch (e) {
+      next(e);
+    }
+  }
 }
 
 module.exports = ConversationController;
