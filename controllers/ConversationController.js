@@ -97,6 +97,7 @@ class ConversationController {
       const geminiResponse = await geminiAI(prompt);
 
       console.log(geminiResponse);
+      return geminiResponse;
     } catch (e) {
       next(e);
     }
