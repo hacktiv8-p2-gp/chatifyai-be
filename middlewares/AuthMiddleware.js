@@ -1,7 +1,7 @@
 const admin = require("firebase-admin");
 const ResponseError = require("../helpers/ResponseError");
 admin.initializeApp({
-  projectId: "hacktiv8-p2-gp-741fe",
+  projectId: process.env.PROJECT_ID,
 });
 
 async function AuthMiddleware(req, res, next) {
