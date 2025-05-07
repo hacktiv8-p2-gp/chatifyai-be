@@ -21,6 +21,7 @@ const {
   getUserCanAccessRoom,
 } = require("./controllers/ConversationController");
 const ErrorMiddleware = require("./middlewares/ErrorMiddleware");
+const ConversationController = require("./controllers/ConversationController");
 
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));

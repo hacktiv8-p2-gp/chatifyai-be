@@ -81,7 +81,7 @@ class ConversationController {
     }
   }
 
-  static async analysisMessage(req, res, next) {
+  static async analysisMessage(roomId) {
     try {
       const { roomId } = req.params;
       const conversations = await Conversation.findAll({
@@ -90,11 +90,13 @@ class ConversationController {
         attributes: ["id", "senderUid", "message", "createdAt"],
       });
 
-      const prompt = `Random Fact about ${character.name} in Wuthering Waves`;
+      console.log(conversations);
+
+      const prompt = `${conversations.message} dari percakapan ini apa response yang baik`;
 
       const geminiResponse = await geminiAI(prompt);
 
-      res.json({ conversations });
+      console.log(geminiResponse);
     } catch (e) {
       next(e);
     }
