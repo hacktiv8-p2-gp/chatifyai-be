@@ -13,15 +13,14 @@ const io = new Server(server, {
 });
 const port = 3000;
 const cors = require("cors");
-const errorHandler = require("./middlewares/ErrorMiddleware");
 const FriendRouter = require("./routers/FriendRouter");
 const ConversationRouter = require("./routers/ConversationRouter");
 const { AuthMiddleware } = require("./middlewares/AuthMiddleware");
-const { Op } = require("sequelize");
 const {
   createMessage,
   getUserCanAccessRoom,
 } = require("./controllers/ConversationController");
+const ErrorMiddleware = require("./middlewares/ErrorMiddleware");
 
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
@@ -80,7 +79,7 @@ app.use(AuthMiddleware);
 app.use("/api/friends", FriendRouter);
 app.use("/api/conversations", ConversationRouter);
 
-app.use(errorHandler);
+app.use(ErrorMiddleware);
 
 server.listen(port, () => {
   console.log(`Server with Socket.IO listening on port ${port}`);

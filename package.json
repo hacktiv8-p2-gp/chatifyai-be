@@ -24,7 +24,7 @@
     "google-auth-library": "^9.15.1",
     "joi": "^17.13.3",
     "jsonwebtoken": "^9.0.2",
-    "nanoid": "^5.1.5",
+    "nanoid": "^3.*",
     "pg": "^8.15.6",
     "sequelize": "^6.37.7",
     "socket.io": "^4.8.1"
