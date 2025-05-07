@@ -34,7 +34,7 @@ app.set("io", io);
 io.use(async (socket, next) => {
   try {
     const token = socket.handshake.auth.token;
-    console.log(token);
+    // console.log(token);
 
     if (!token || typeof token !== "string") {
       throw new ResponseError("Invalid token format", 401);
@@ -56,7 +56,6 @@ io.use(async (socket, next) => {
 });
 
 io.on("connection", (socket) => {
-  console.log("THis is masuk");
   socket.on("join-room", async (roomId) => {
     try {
       const canAccess = await getUserCanAccessRoom(roomId, socket.user.uid);
@@ -73,12 +72,9 @@ io.on("connection", (socket) => {
   socket.on("send-message", async ({ roomId, message }) => {
     try {
       const user = socket.user;
-      console.log(roomId, message, user);
       const messageData = await createMessage({ roomId, message, user });
-      console.log(messageData);
 
       io.to(roomId).emit("receive-message", messageData);
-      console.log(io);
     } catch (error) {
       socket.emit("error", error.message || "Internal Server Error");
     }
