@@ -1,5 +1,5 @@
 const { Friend } = require("../models");
-const { Op } = require("sequelize");
+const { Op, where } = require("sequelize");
 const { admin } = require("../middlewares/AuthMiddleware");
 const { getAuth } = require("firebase-admin/auth");
 const ResponseError = require("../helpers/ResponseError");
@@ -113,6 +113,26 @@ class FriendController {
       });
     } catch (e) {
       console.log(e);
+      next(e);
+    }
+  }
+
+  static async deleteFriend(req, res, next) {
+    try {
+      const { roomId } = req.params;
+
+      const deleted = await Friend.destroy({
+        where: { roomId },
+      });
+
+      if (!deleted) {
+        throw new ResponseError("Friend not found", 404);
+      }
+
+      res.status(200).json({
+        message: "Friend deleted successfully",
+      });
+    } catch (e) {
       next(e);
     }
   }
