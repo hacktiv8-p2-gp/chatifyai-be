@@ -1,6 +1,7 @@
 const { Conversation, Friend } = require("../models");
 const ResponseError = require("../helpers/ResponseError");
 const { Op } = require("sequelize");
+const geminiAI = require("../helpers/Gemini");
 
 class ConversationController {
   static async getByRoomId(req, res, next) {
@@ -75,6 +76,25 @@ class ConversationController {
           createdAt: conversation.createdAt,
         },
       };
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  static async analysisMessage(req, res, next) {
+    try {
+      const { roomId } = req.params;
+      const conversations = await Conversation.findAll({
+        where: { roomId },
+        order: [["createdAt", "ASC"]],
+        attributes: ["id", "senderUid", "message", "createdAt"],
+      });
+
+      const prompt = `Random Fact about ${character.name} in Wuthering Waves`;
+
+      const geminiResponse = await geminiAI(prompt);
+
+      res.json({ conversations });
     } catch (e) {
       next(e);
     }
