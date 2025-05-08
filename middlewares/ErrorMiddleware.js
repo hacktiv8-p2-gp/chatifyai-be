@@ -1,23 +1,21 @@
 const ResponseError = require("../helpers/ResponseError");
 
-const errorHandler = (err, req, res, next) => {
+const ErrorMiddleware = (err, req, res, next) => {
   if (!err) {
     next();
   }
 
-  let statusCode = 500;
-  let message = "Internal Server Error";
-
   if (err instanceof ResponseError) {
-    statusCode = err.statusCode || 500;
-    message = err.message || "Internal Server Error";
+    res.status(err.statusCode).json({
+      message: err.message,
+    });
   }
 
-  res.status(statusCode).json({
-    message: message,
+  res.status(500).json({
+    message: "Internal Server Error",
   });
 
   next();
 };
 
-module.exports = errorHandler;
+module.exports = ErrorMiddleware;

@@ -1,5 +1,7 @@
 const { Conversation, Friend } = require("../models");
 const ResponseError = require("../helpers/ResponseError");
+const { Op } = require("sequelize");
+const geminiAI = require("../helpers/Gemini");
 
 class ConversationController {
   static async getByRoomId(req, res, next) {
@@ -29,6 +31,7 @@ class ConversationController {
         data: conversations,
       });
     } catch (e) {
+      console.log(e);
       next(e);
     }
   }
@@ -73,6 +76,36 @@ class ConversationController {
           createdAt: conversation.createdAt,
         },
       };
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+  static async analysisMessage(req, res, next) {
+    try {
+      const { roomId, message } = req.body;
+
+      const conversations = await Conversation.findAll({
+        where: { roomId },
+        order: [["createdAt", "ASC"]],
+        attributes: ["id", "senderUid", "message", "createdAt"],
+      });
+
+      let arrayMessage = conversations.map((el) => el.dataValues.message);
+
+      console.log(arrayMessage);
+
+      const prompt = `${[
+        ...arrayMessage,
+      ]} dari percakapan ini apa response yang baik, ketika ingin meresponse dengan ${message} sebagai dasar. Cukup berikan satu response saja`;
+
+      console.log(prompt);
+
+      const geminiResponse = await geminiAI(prompt);
+
+      // geminiResponse = geminiResponse.split('"')[1];
+      console.log(geminiResponse);
+      res.status(200).json({ message: geminiResponse });
     } catch (e) {
       next(e);
     }

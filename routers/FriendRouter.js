@@ -1,9 +1,16 @@
 const express = require("express");
-const { getAll, request } = require("../controllers/FriendController");
+const {
+  getAll,
+  request,
+  get,
+  deleteFriend,
+} = require("../controllers/FriendController");
 
 const FriendRouter = express.Router();
 
 FriendRouter.get("/", getAll);
-FriendRouter.get("/request", request);
+FriendRouter.post("/request", request);
+FriendRouter.delete("/delete/:roomId", deleteFriend);
+FriendRouter.get("/:email", get);
 
 module.exports = FriendRouter;
