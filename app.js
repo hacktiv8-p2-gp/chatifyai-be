@@ -11,7 +11,7 @@ const io = new Server(server, {
     origin: "*",
   },
 });
-const port = 3000;
+const port = process.env.PORT || 3000;
 const cors = require("cors");
 const FriendRouter = require("./routers/FriendRouter");
 const ConversationRouter = require("./routers/ConversationRouter");
